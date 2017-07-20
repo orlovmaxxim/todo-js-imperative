@@ -6,18 +6,18 @@ const todoInput = document.getElementById('add-input');
 const todoList = document.getElementById('todo-list');
 const todoItems = document.querySelectorAll('.todo-item');
 
-// вспомогательные функции
-function createInputElem (typeElem, classElem) {
-  let elem = document.createElement('input');
-  elem.type = typeElem;
-  elem.className = classElem;
-  return elem;
-}
-
-function createDomElem (tagElem, text, classElem) {
+// pattern фасад - вспомогательная функция createElement
+function createElement(tagElem, props, ...children) {
   let elem = document.createElement(tagElem);
-  elem.innerText = text;
-  elem.className = classElem;
+  Object.keys(props).forEach(key => elem[key] = props[key]);
+  if (children.length > 0) {
+    children.forEach(child => {
+      if (typeof child === 'string') {
+        child = document.createTextNode(child);
+      }
+      elem.appendChild(child);
+    });
+  }
   return elem;
 }
 
@@ -67,28 +67,15 @@ function deleteTask (e) {
 /////////////////////////////////////////////////////////////
 
 function createTask (title) {
-  // checkbox
-  const checkbox = createInputElem('checkbox', 'checkbox');
-  // label
-  const label = createDomElem('label', title, 'title');
-  // edit input
-  const editInput = createInputElem('text', 'textfield');
-  // edit btn
-  const editBtn = createDomElem('button', 'Edit', 'edit');
-  // delete btn
-  const deleteBtn = createDomElem('button', 'Delete', 'delete');
-  // li
-  const li = document.createElement('li');
-  li.className = 'todo-item';
 
-  li.appendChild(checkbox);
-  li.appendChild(label);
-  li.appendChild(editInput);
-  li.appendChild(editBtn);
-  li.appendChild(deleteBtn);
+  const checkbox = createElement('input', { type: 'checkbox', className: 'checkbox' });
+  const label = createElement('label', { className: 'title' }, title);
+  const editInput = createElement('input', { type: 'text', className: 'textfield' });
+  const editBtn = createElement('button', { className: 'edit' }, 'Изменить');
+  const deleteBtn = createElement('button', { className: 'delete' }, 'Удалить');
+  const li = createElement('li', { className: 'todo-item' }, checkbox, label, editInput, editBtn, deleteBtn);
 
   eveListeners(li);
-
   return li;
 }
 
